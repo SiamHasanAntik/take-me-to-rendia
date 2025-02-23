@@ -375,8 +375,40 @@ document.addEventListener("keydown", function (event) {
     }
 });
 
+// 🚀 Mobile Touch Support
+document.addEventListener("touchstart", function(event) {
+    event.preventDefault();  // Prevents accidental scrolling
+    if (!isGameOver) {
+        if (!gameStarted) {
+            gameStarted = true;
+            bgMusic.play();
+            startScoring(); 
+            startObstacleSpawn();
+            createPipe();  // Start pipes immediately
+        }
+        jump();  // Make bird jump on tap
+    }
+});
+
+// 🏆 Ensure Game Restarts on Tap After Game Over
+document.addEventListener("touchend", function() {
+    if (isGameOver) restartGame();
+});
 
 
     </script>
 </body>
 </html>
+
+
+
+
+
+<!-- echo "# take-me-to-rendia" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/SiamHasanAntik/take-me-to-rendia.git
+git push -u origin main
+ -->
