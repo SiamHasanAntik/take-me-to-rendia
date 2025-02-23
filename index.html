@@ -107,7 +107,7 @@
         let bgMusic = document.getElementById("bg-music");
         let gameOverSound = document.getElementById("game-over-sound");
 
-        let pipeImages = ['images/Adobe Express - file (1).png', 'images/Adobe Express - file (2).png', 'images/Adobe Express - file (4).png' , 'images/Adobe Express - file (4).png' , 'images/জাতীয়_পার্টি_(এরশাদ)-এর_লোগো.png' ,'images/Adobe Express - file (5).png'];
+        let pipeImages = ['images/Adobe Express - file (1).png', 'images/Adobe Express - file (2).png', 'images/Adobe Express - file (4).png' , 'images/জাতীয়_পার্টি_(এরশাদ)-এর_লোগো.png' ,'images/Adobe Express - file (5).png'];
         let obstacleImages = ['images/Adobe Express - file (1).png', 'images/Adobe Express - file (2).png', 'images/Adobe Express - file (3).png', 'images/জাতীয়_পার্টি_(এরশাদ)-এর_লোগো.png' , 'images/Adobe Express - file (4).png' ,'images/Adobe Express - file (5).png'];
 
         document.addEventListener("keydown", function(event) {
@@ -203,7 +203,7 @@
             }, 500);
         }
 
-        setInterval(createPipe, 900); 
+        setInterval(createPipe, 1600); 
 
         function throwObstacle(pipe) {
             let obstacle = document.createElement("div");
@@ -363,7 +363,7 @@ function startObstacleSpawn() {
         if (!isGameOver) {
             throwObstacle();
         }
-    }, Math.floor(Math.random() * 1000) + 500); // Spawn every 500–1500ms randomly
+    }, Math.floor(Math.random() * 1000) + 1000); // Spawn every 500–1500ms randomly
 }
 
 // Start spawning obstacles when the game starts
@@ -421,10 +421,6 @@ document.addEventListener("touchstart", function(event) {
 function playMusic() {
     bgMusic.play().catch(error => console.log("Autoplay blocked:", error));
 }
-
-
-
-
     </script>
 </body>
 </html>
