@@ -82,6 +82,8 @@
     </style>
 </head>
 <body>
+    <button id="start-game-btn">Start Game</button>
+
     <audio id="bg-music" loop>
         <source src="sound/indian national anthem 2024 new edition [Bangladesh ].mp3" type="audio/mpeg">
     </audio>
@@ -393,6 +395,38 @@ document.addEventListener("touchstart", function(event) {
 // 🏆 Ensure Game Restarts on Tap After Game Over
 document.addEventListener("touchend", function() {
     if (isGameOver) restartGame();
+});
+
+
+document.getElementById("start-game-btn").addEventListener("click", function() {
+    bgMusic.play().catch(error => console.log("Autoplay blocked:", error));
+    gameStarted = true;
+    startScoring();
+    startObstacleSpawn();
+    createPipe();
+    this.style.display = "none"; // Hide button after starting
+});
+
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === " " && !gameStarted) {
+        gameStarted = true;
+        bgMusic.play().catch(error => console.log("Autoplay blocked:", error));
+        startScoring();
+        startObstacleSpawn();
+        createPipe();
+    }
+});
+
+document.addEventListener("touchstart", function(event) {
+    event.preventDefault();
+    if (!gameStarted) {
+        gameStarted = true;
+        bgMusic.play().catch(error => console.log("Autoplay blocked:", error));
+        startScoring();
+        startObstacleSpawn();
+        createPipe();
+    }
 });
 
 
