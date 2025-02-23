@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird - Balanced Hard Mode</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: skyblue;
+            overflow: hidden;
+        }
+        .game-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            border: 2px solid black;
+            background: url('images/Blue\ and\ White\ Cloud\ Wallpaper.png') no-repeat center center/cover;
+            overflow: hidden;
+        }
+        .bird {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            background: url('images/Adobe\ Express\ -\ file.png') no-repeat center/cover;
+            background-size: contain;
+            
+                
+            
+            
+        }
+        .smoke {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gray;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+        .pipe {
+            position: absolute;
+            width: 50px;
+            right: -50px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+        .pipe img {
+            width: 50px;
+            height: auto;
+            max-height: 120px;
+        }
+        .obstacle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .score {
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+
+
+    </style>
+</head>
+<body>
+    <audio id="bg-music" loop>
+        <source src="sound/indian national anthem 2024 new edition [Bangladesh ].mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="game-over-sound">
+        <source src="sound/Jacquelines Ahh Moaning Sound on Koffee with Karan  Green Screen Meme  @vfxnoob.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="game-container">
+        <div class="bird" id="bird"></div>
+    </div>
+
+    <div class="score" id="score">Score: 0</div>
+
+
+    <script>
+        let bird = document.getElementById("bird");
+        let gameContainer = document.querySelector(".game-container");
+        let gravity = 1.5;
+        let gameStarted = false;
+        let isGameOver = false;
+        let bgMusic = document.getElementById("bg-music");
+        let gameOverSound = document.getElementById("game-over-sound");
+
+        let pipeImages = ['images/Adobe Express - file (1).png', 'images/Adobe Express - file (2).png', 'images/Adobe Express - file (4).png' , 'images/Adobe Express - file (4).png' , 'images/জাতীয়_পার্টি_(এরশাদ)-এর_লোগো.png' ,'images/Adobe Express - file (5).png'];
+        let obstacleImages = ['images/Adobe Express - file (1).png', 'images/Adobe Express - file (2).png', 'images/Adobe Express - file (3).png', 'images/জাতীয়_পার্টি_(এরশাদ)-এর_লোগো.png' , 'images/Adobe Express - file (4).png' ,'images/Adobe Express - file (5).png'];
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === " ") {
+                if (isGameOver) {
+                    restartGame();
+                } else {
+                    if (!gameStarted) {
+                        gameStarted = true;
+                        bgMusic.play(); // Start background music when the game starts
+                    }
+                    jump();
+                }
+            }
+        });
+
+        function jump() {
+            let birdTop = parseInt(window.getComputedStyle(bird).getPropertyValue("top"));
+            if (birdTop > 0) {
+                bird.style.top = (birdTop - 50) + "px";
+            }
+        }
+
+        setInterval(() => {
+            if (!isGameOver) {
+                let birdTop = parseInt(window.getComputedStyle(bird).getPropertyValue("top"));
+                if (birdTop < 460) {
+                    bird.style.top = (birdTop + gravity) + "px";
+                }
+                createSmoke();
+            }
+        }, 15);
+
+        function createSmoke() {
+            let smoke = document.createElement("div");
+            smoke.classList.add("smoke");
+
+            let birdRect = bird.getBoundingClientRect();
+            let gameContainerRect = gameContainer.getBoundingClientRect();
+
+            smoke.style.left = (birdRect.left - gameContainerRect.left - 10) + "px";
+            smoke.style.top = (birdRect.top - gameContainerRect.top + 15) + "px";
+
+            let size = Math.random() * 10 + 5;
+            smoke.style.width = size + "px";
+            smoke.style.height = size + "px";
+            smoke.style.opacity = 0.8;
+
+            gameContainer.appendChild(smoke);
+
+            let moveSmoke = setInterval(() => {
+                let smokeLeft = parseInt(smoke.style.left);
+                smoke.style.left = (smokeLeft - 2) + "px";
+                smoke.style.opacity -= 0.02;
+
+                if (smoke.style.opacity <= 0) {
+                    clearInterval(moveSmoke);
+                    gameContainer.removeChild(smoke);
+                }
+            }, 50);
+        }
+
+        function createPipe() {
+            let pipe = document.createElement("div");
+            let pipeImg = document.createElement("img");
+            let pipeHeight = Math.floor(Math.random() * 120) + 30; 
+            let randomImage = pipeImages[Math.floor(Math.random() * pipeImages.length)];
+
+            pipe.classList.add("pipe");
+            pipe.style.height = pipeHeight + "px";
+            pipe.style.top = Math.random() > 0.5 ? "0px" : (500 - pipeHeight) + "px";
+            pipe.style.right = "-50px";
+
+            pipeImg.src = randomImage;
+            pipe.appendChild(pipeImg);
+            gameContainer.appendChild(pipe);
+
+            let moveInterval = setInterval(() => {
+                if (!isGameOver) {
+                    let pipeRight = parseInt(window.getComputedStyle(pipe).getPropertyValue("right"));
+                    pipe.style.right = (pipeRight + 5) + "px"; 
+
+                    if (pipeRight > 400) {
+                        clearInterval(moveInterval);
+                        gameContainer.removeChild(pipe);
+                    }
+                    checkCollision(bird, pipeImg);
+                }
+            }, 20);
+
+            setTimeout(() => {
+                throwObstacle(pipe);
+            }, 500);
+        }
+
+        setInterval(createPipe, 900); 
+
+        function throwObstacle(pipe) {
+            let obstacle = document.createElement("div");
+            let randomObstacleImage = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
+            obstacle.classList.add("obstacle");
+            obstacle.style.backgroundImage = `url('${randomObstacleImage}')`;
+
+            let pipeRect = pipe.getBoundingClientRect();
+            obstacle.style.top = pipeRect.bottom + "px";
+            obstacle.style.left = pipeRect.left + "px";
+
+            gameContainer.appendChild(obstacle);
+
+            let moveObstacle = setInterval(() => {
+                if (!isGameOver) {
+                    let obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+                    obstacle.style.left = (obstacleLeft - 6) + "px";
+
+                    if (obstacleLeft < 0) {
+                        clearInterval(moveObstacle);
+                        gameContainer.removeChild(obstacle);
+                    }
+                    checkCollision(bird, obstacle);
+                }
+            }, 20);
+        }
+
+        function checkCollision(bird, obj) {
+            let birdRect = bird.getBoundingClientRect();
+            let objRect = obj.getBoundingClientRect();
+
+            if (
+                birdRect.right > objRect.left &&
+                birdRect.left < objRect.right &&
+                birdRect.bottom > objRect.top &&
+                birdRect.top < objRect.bottom
+            ) {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            bgMusic.pause(); // Stop background music
+            bgMusic.currentTime = 0;
+            gameOverSound.play(); // Play game-over sound
+            alert("🔥 GAME OVER! 🔥 Press Space to Restart.");
+        }
+
+        function restartGame() {
+            location.reload();
+        }
+
+
+
+        
+        let score = 0;
+let scoreElement = document.getElementById("score");
+
+// Function to update score every second
+function startScoring() {
+    setInterval(() => {
+        if (!isGameOver) {
+            score += 1; // Increase score over time
+            scoreElement.innerText = `Score: ${score}`;
+        }
+    }, 1000); // Runs every 1 second
+}
+
+// Modify createPipe function to add **+1 point** when a pipe is passed
+function createPipe() {
+    let pipe = document.createElement("div");
+    let pipeImg = document.createElement("img");
+    let pipeHeight = Math.floor(Math.random() * 120) + 30; 
+    let randomImage = pipeImages[Math.floor(Math.random() * pipeImages.length)];
+
+    pipe.classList.add("pipe");
+    pipe.style.height = pipeHeight + "px";
+    pipe.style.top = Math.random() > 0.5 ? "0px" : (500 - pipeHeight) + "px";
+    pipe.style.right = "-50px";
+
+    pipeImg.src = randomImage;
+    pipe.appendChild(pipeImg);
+    gameContainer.appendChild(pipe);
+
+    let moveInterval = setInterval(() => {
+        if (!isGameOver) {
+            let pipeRight = parseInt(window.getComputedStyle(pipe).getPropertyValue("right"));
+            pipe.style.right = (pipeRight + 5) + "px"; 
+
+            if (pipeRight > 400) {
+                clearInterval(moveInterval);
+                gameContainer.removeChild(pipe);
+                score += 1; // Now adds **+1 per pipe** instead of 5
+                scoreElement.innerText = `Score: ${score}`;
+            }
+            checkCollision(bird, pipeImg);
+        }
+    }, 20);
+
+    setTimeout(() => {
+        throwObstacle(pipe);
+    }, 500);
+}
+
+// Start scoring when the game starts
+document.addEventListener("keydown", function (event) {
+    if (event.key === " " && !gameStarted) {
+        gameStarted = true;
+        bgMusic.play();
+        startScoring(); // Start the score update system
+    }
+});
+
+// Show final score on game over
+function gameOver() {
+    isGameOver = true;
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    gameOverSound.play();
+    alert(`🔥 GAME OVER! 🔥 Your Score: ${score}\nPress Space to Restart.`);
+}
+
+
+function throwObstacle() {
+    let obstacle = document.createElement("div");
+    let randomObstacleImage = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
+    
+    obstacle.classList.add("obstacle");
+    obstacle.style.backgroundImage = `url('${randomObstacleImage}')`;
+    
+    // Random height for obstacle within the game container
+    let obstacleTop = Math.floor(Math.random() * 400); // Ensures it stays inside
+    obstacle.style.top = obstacleTop + "px";
+    obstacle.style.left = "420px"; // Spawn from right side (offscreen)
+
+    gameContainer.appendChild(obstacle);
+
+    let moveObstacle = setInterval(() => {
+        if (!isGameOver) {
+            let obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+            obstacle.style.left = (obstacleLeft - 6) + "px"; // Move left
+
+            if (obstacleLeft < -30) { 
+                clearInterval(moveObstacle);
+                gameContainer.removeChild(obstacle);
+            }
+
+            checkCollision(bird, obstacle);
+        }
+    }, 20);
+}
+
+// Randomly generate obstacles at different intervals
+function startObstacleSpawn() {
+    setInterval(() => {
+        if (!isGameOver) {
+            throwObstacle();
+        }
+    }, Math.floor(Math.random() * 1000) + 500); // Spawn every 500–1500ms randomly
+}
+
+// Start spawning obstacles when the game starts
+document.addEventListener("keydown", function (event) {
+    if (event.key === " " && !gameStarted) {
+        gameStarted = true;
+        bgMusic.play();
+        startScoring(); 
+        startObstacleSpawn(); // Start generating obstacles randomly
+    }
+});
+
+
+
+    </script>
+</body>
+</html>
