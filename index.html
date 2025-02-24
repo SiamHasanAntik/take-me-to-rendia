@@ -421,6 +421,46 @@ document.addEventListener("touchstart", function(event) {
 function playMusic() {
     bgMusic.play().catch(error => console.log("Autoplay blocked:", error));
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    bgMusic.muted = true; // Start muted to bypass Messenger restrictions
+    bgMusic.play().then(() => {
+        bgMusic.pause();  // Pause immediately, waiting for user interaction
+        bgMusic.currentTime = 0;  
+        bgMusic.muted = false; // Unmute once it's allowed
+    }).catch(error => console.log("Autoplay blocked:", error));
+});
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === " " && !gameStarted) {
+        gameStarted = true;
+        playMusic();
+        startScoring();
+        startObstacleSpawn();
+        createPipe();
+    }
+});
+
+document.addEventListener("touchstart", function(event) {
+    event.preventDefault();
+    if (!gameStarted) {
+        gameStarted = true;
+        playMusic();
+        startScoring();
+        startObstacleSpawn();
+        createPipe();
+    }
+});
+
+function playMusic() {
+    bgMusic.muted = false; // Ensure it's unmuted
+    bgMusic.volume = 0.5; // Adjust volume if needed
+    bgMusic.play().catch(error => console.log("Music play blocked:", error));
+}
+
+
+
+
     </script>
 </body>
 </html>
