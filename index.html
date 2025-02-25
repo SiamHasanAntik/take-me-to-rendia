@@ -461,6 +461,28 @@ function playMusic() {
 
 
 
+document.addEventListener("DOMContentLoaded", () => {
+    let startButton = document.getElementById("start-button");
+    let bgMusic = document.getElementById("bg-music");
+
+    startButton.addEventListener("click", () => {
+        bgMusic.muted = false; // Unmute
+        bgMusic.play().then(() => {
+            startButton.style.display = "none"; // Hide button after playing
+            gameStarted = true;
+            startScoring();
+            startObstacleSpawn();
+            createPipe();
+        }).catch(error => {
+            console.log("Facebook Lite blocked autoplay:", error);
+            alert("⚠️ Please tap again to enable audio.");
+        });
+    });
+});
+
+
+
+
     </script>
 </body>
 </html>
